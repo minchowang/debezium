@@ -641,6 +641,16 @@ public abstract class RelationalSnapshotChangeEventSource<P extends Partition, O
      */
     private Optional<String> determineSnapshotSelect(RelationalSnapshotContext<P, O> snapshotContext, TableId tableId,
                                                      Map<DataCollectionId, String> snapshotSelectOverridesByTable) {
+        // if the snapshotSelectOverridesByTable included key 'table_placeholder'
+        // then we need to replace the 'table_placeholder' with the actual table name
+        // input: SELECT * FROM table_placeholder WHERE update_time > '2020-01-01 00:00:00'
+        // output: SELECT * FROM "catalog"."schema"."table" WHERE update_time > '2020-01-01 00:00:00'
+        if (connectorConfig.getSnapshotSelectOverridesByTable().containsKey(TableId.parse("table_placeholder"))) {
+            return Optional.of(enhanceOverriddenSelect(snapshotContext,
+                    connectorConfig.getSnapshotSelectOverridesByTable().get(TableId.parse("table_placeholder")).replace("table_placeholder",
+                            tableId.toDoubleQuotedString()),
+                    tableId));
+        }
         String overriddenSelect = getSnapshotSelectOverridesByTable(tableId, snapshotSelectOverridesByTable);
         if (overriddenSelect != null) {
             return Optional.of(enhanceOverriddenSelect(snapshotContext, overriddenSelect, tableId));
