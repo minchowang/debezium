@@ -24,6 +24,7 @@ import io.debezium.connector.mysql.MySqlConnectorConfig.BigIntUnsignedHandlingMo
 import io.debezium.connector.mysql.MySqlConnectorConfig.SnapshotMode;
 import io.debezium.document.DocumentReader;
 import io.debezium.jdbc.DefaultMainConnectionProvidingConnectionFactory;
+import io.debezium.jdbc.JdbcConnectionException;
 import io.debezium.jdbc.JdbcValueConverters.BigIntUnsignedMode;
 import io.debezium.jdbc.JdbcValueConverters.DecimalMode;
 import io.debezium.jdbc.MainConnectionProvidingConnectionFactory;
@@ -53,6 +54,7 @@ public class MySqlConnectorTask extends BaseSourceTask<MySqlPartition, MySqlOffs
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MySqlConnectorTask.class);
     private static final String CONTEXT_NAME = "mysql-connector-task";
+    private static final String TDSQL_C_VERSION_STRING = "cynos";
 
     private volatile MySqlTaskContext taskContext;
     private volatile ChangeEventQueue<DataChangeEvent> queue;
@@ -268,6 +270,29 @@ public class MySqlConnectorTask extends BaseSourceTask<MySqlPartition, MySqlOffs
         }
     }
 
+    private String getServerVersion() {
+        try {
+            String version = connection.queryAndMap(
+                    "SELECT VERSION()", rs -> rs.next() ? rs.getString(1) : "");
+            LOGGER.info("Retrieved server version: {}", version);
+            return version;
+        }
+        catch (SQLException ex) {
+            LOGGER.warn("Unexpected error while connecting to server and validating", ex);
+            return "";
+        }
+        finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                }
+                catch (SQLException e) {
+                    throw new JdbcConnectionException("Closing connection error", e);
+                }
+            }
+        }
+    }
+
     /**
      * Determine whether the binlog position as set on the {@link MySqlOffsetContext} is available in the server.
      *
@@ -278,6 +303,12 @@ public class MySqlConnectorTask extends BaseSourceTask<MySqlPartition, MySqlOffs
         if (gtidStr != null) {
             if (gtidStr.trim().isEmpty()) {
                 return true; // start at beginning ...
+            }
+            // If the server is TDSQL-C, loosen the GTID check as it has a different logic from MySQL.
+            String serverVersion = getServerVersion();
+            if (serverVersion.contains(TDSQL_C_VERSION_STRING)) {
+                LOGGER.warn("GTID test is skipped for TDSQL-C instances.");
+                return true;
             }
             String availableGtidStr = connection.knownGtidSet();
             if (availableGtidStr == null || availableGtidStr.trim().isEmpty()) {
