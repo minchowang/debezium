@@ -68,6 +68,10 @@ public final class JdbcSchemaHistory extends AbstractSchemaHistory {
 
         try {
             conn = DriverManager.getConnection(this.config.getJdbcUrl(), this.config.getUser(), this.config.getPassword());
+            if (this.config.getJdbcUrl().contains("sqlite")) {
+                Statement st = conn.createStatement();
+                st.execute("PRAGMA synchronous = OFF");
+            }
             conn.setAutoCommit(false);
         }
         catch (SQLException e) {
