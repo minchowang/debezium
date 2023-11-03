@@ -16,6 +16,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
+
 /** Temporal conversion constants. */
 public final class TemporalConversions {
 
@@ -107,6 +108,13 @@ public final class TemporalConversions {
         }
         if (obj instanceof Duration) {
             Long value = ((Duration) obj).toNanos();
+            if (value >= 86400000000000L) {
+                long seconds = ((Duration) obj).getSeconds();
+                long hours = seconds / 3600;
+                long minutes = (seconds % 3600) / 60;
+                long remainingSeconds = seconds % 60;
+                return LocalTime.of((int) hours % 24, (int) minutes, (int) remainingSeconds);
+            }
             if (value >= 0 && value <= NANOSECONDS_PER_DAY) {
                 return LocalTime.ofNanoOfDay(value);
             }
