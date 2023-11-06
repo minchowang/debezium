@@ -5,8 +5,6 @@
  */
 package io.debezium.connector.mysql;
 
-import static java.util.function.Predicate.not;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -324,10 +322,10 @@ public class MySqlSnapshotChangeEventSource extends RelationalSnapshotChangeEven
 
         List<SchemaChangeEvent> schemaChangeEvents = databaseSchema.parseSnapshotDdl(snapshotContext.partition, ddl, database,
                 snapshotContext.offset, clock.currentTimeAsInstant());
-        List<SchemaChangeEvent> missingSchemaChangeEvents = schemaChangeEvents.stream()
-                .filter(not(schemaEvents::contains))
-                .collect(Collectors.toList());
-        schemaEvents.addAll(missingSchemaChangeEvents);
+        // List<SchemaChangeEvent> missingSchemaChangeEvents = schemaChangeEvents.stream()
+        // .filter(not(schemaEvents::contains))
+        // .collect(Collectors.toList());
+        schemaEvents.addAll(schemaChangeEvents);
     }
 
     @Override
