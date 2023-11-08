@@ -44,6 +44,8 @@ public interface HistorizedDatabaseSchema<I extends DataCollectionId> extends Da
 
     void initializeStorage();
 
+    void resetStorage();
+
     Predicate<String> ddlFilter();
 
     boolean skipUnparseableDdlStatements();

@@ -371,6 +371,7 @@ public class MySqlConnectorTask extends BaseSourceTask<MySqlPartition, MySqlOffs
                 throw new DebeziumException("Could not find existing binlog information while attempting schema only recovery snapshot");
             }
             LOGGER.info("Connector started for the first time, database schema history recovery will not be executed");
+            schema.resetStorage();
             schema.initializeStorage();
             return false;
         }

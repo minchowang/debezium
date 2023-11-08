@@ -129,6 +129,11 @@ public class RedisSchemaHistory extends AbstractSchemaHistory {
     }
 
     @Override
+    public void resetStorage() {
+
+    }
+
+    @Override
     public boolean exists() {
         // check if the stream is not empty
         return doWithRetry(() -> (client != null) && (client.xlen(config.getRedisKeyName()) > 0), "Check if previous record exists");

@@ -45,6 +45,11 @@ public final class MemorySchemaHistory extends AbstractSchemaHistory {
     }
 
     @Override
+    public void resetStorage() {
+
+    }
+
+    @Override
     public boolean exists() {
         return !records.isEmpty();
     }

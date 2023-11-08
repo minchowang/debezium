@@ -139,6 +139,16 @@ public final class FileSchemaHistory extends AbstractFileBasedSchemaHistory {
     }
 
     @Override
+    public void resetStorage() {
+        try {
+            Files.deleteIfExists(path);
+        }
+        catch (IOException e) {
+            throw new SchemaHistoryException("Unable to delete history file at " + path + ": " + e.getMessage(), e);
+        }
+    }
+
+    @Override
     public String toString() {
         return "file " + (path != null ? path : "(unstarted)");
     }

@@ -91,6 +91,13 @@ public abstract class HistorizedRelationalDatabaseSchema extends RelationalDatab
         }
     }
 
+    @Override
+    public void resetStorage() {
+        if (schemaHistory.storageExists()) {
+            schemaHistory.resetStorage();
+        }
+    }
+
     /**
      * Returns a new instance of the {@link DdlParser} to be used when recovering the schema from a previously persisted
      * history.

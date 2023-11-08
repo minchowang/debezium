@@ -251,4 +251,14 @@ public final class JdbcSchemaHistory extends AbstractSchemaHistory {
             throw new SchemaHistoryException("Error initializing Database history storage", e);
         }
     }
+
+    @Override
+    public void resetStorage() {
+        try {
+            conn.prepareStatement(String.format("DELETE FROM %s", config.getTableName())).execute();
+        }
+        catch (SQLException e) {
+            throw new SchemaHistoryException("Error clearing Database history storage", e);
+        }
+    }
 }

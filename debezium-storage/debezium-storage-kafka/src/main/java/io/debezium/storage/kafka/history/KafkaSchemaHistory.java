@@ -568,6 +568,11 @@ public class KafkaSchemaHistory extends AbstractSchemaHistory {
         }
     }
 
+    @Override
+    public void resetStorage() {
+
+    }
+
     private short getDefaultTopicReplicationFactor(AdminClient admin) throws Exception {
         try {
             Config brokerConfig = getKafkaBrokerConfig(admin);

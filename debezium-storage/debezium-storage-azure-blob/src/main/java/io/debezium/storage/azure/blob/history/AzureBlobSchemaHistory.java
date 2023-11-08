@@ -139,6 +139,11 @@ public class AzureBlobSchemaHistory extends AbstractFileBasedSchemaHistory {
     }
 
     @Override
+    public void resetStorage() {
+
+    }
+
+    @Override
     public String toString() {
         return "Azure Blob Storage";
     }

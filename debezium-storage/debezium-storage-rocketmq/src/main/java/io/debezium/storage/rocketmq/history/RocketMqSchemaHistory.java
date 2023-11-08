@@ -170,6 +170,11 @@ public class RocketMqSchemaHistory extends AbstractSchemaHistory {
     }
 
     @Override
+    public void resetStorage() {
+
+    }
+
+    @Override
     public synchronized void start() {
         super.start();
         try {

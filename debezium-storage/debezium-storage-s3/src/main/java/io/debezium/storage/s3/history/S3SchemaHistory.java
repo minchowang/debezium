@@ -227,6 +227,11 @@ public class S3SchemaHistory extends AbstractFileBasedSchemaHistory {
     }
 
     @Override
+    public void resetStorage() {
+
+    }
+
+    @Override
     public String toString() {
         return "S3";
     }

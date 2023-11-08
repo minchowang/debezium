@@ -2960,6 +2960,11 @@ public class SqlServerConnectorIT extends AbstractConnectorTest {
         public void initializeStorage() {
             delegate.initializeStorage();
         }
+
+        @Override
+        public void resetStorage() {
+
+        }
     }
 
     @FunctionalInterface

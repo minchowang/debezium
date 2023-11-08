@@ -220,4 +220,6 @@ public interface SchemaHistory {
      * Called to initialize permanent storage of the history.
      */
     void initializeStorage();
+
+    void resetStorage();
 }
