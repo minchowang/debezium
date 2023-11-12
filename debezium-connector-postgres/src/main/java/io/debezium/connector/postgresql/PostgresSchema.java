@@ -84,7 +84,11 @@ public class PostgresSchema extends RelationalDatabaseSchema {
         connection.readSchema(tables(), null, null, getTableFilter(), null, true);
         if (printReplicaIdentityInfo) {
             // print out all the replica identity info
-            tableIds().forEach(tableId -> printReplicaIdentityInfo(connection, tableId));
+            // tableIds().forEach(tableId -> printReplicaIdentityInfo(connection, tableId));
+            tableIds().forEach(tableId -> {
+                LOGGER.info("Table '{}' printReplicaIdentityInfo.", tableId);
+            });
+
         }
         // and then refresh the schemas
         refreshSchemas();

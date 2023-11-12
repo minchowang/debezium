@@ -98,7 +98,7 @@ public class PostgresSnapshotChangeEventSource extends RelationalSnapshotChangeE
         if (snapshotter.shouldStreamEventsStartingFromSnapshot() && startingSlotInfo == null) {
             setSnapshotTransactionIsolationLevel();
         }
-        schema.refresh(jdbcConnection, false);
+        // schema.refresh(jdbcConnection, false);
     }
 
     @Override
@@ -186,31 +186,32 @@ public class PostgresSnapshotChangeEventSource extends RelationalSnapshotChangeE
                                       RelationalSnapshotContext<PostgresPartition, PostgresOffsetContext> snapshotContext,
                                       PostgresOffsetContext offsetContext, SnapshottingTask snapshottingTask)
             throws SQLException, InterruptedException {
-        Set<String> schemas = snapshotContext.capturedTables.stream()
-                .map(TableId::schema)
-                .collect(Collectors.toSet());
+        // Set<String> schemas = snapshotContext.capturedTables.stream()
+        // .map(TableId::schema)
+        // .collect(Collectors.toSet());
 
         // reading info only for the schemas we're interested in as per the set of captured tables;
         // while the passed table name filter alone would skip all non-included tables, reading the schema
         // would take much longer that way
-        for (String schema : schemas) {
-            if (!sourceContext.isRunning()) {
-                throw new InterruptedException("Interrupted while reading structure of schema " + schema);
-            }
-
-            LOGGER.info("Reading structure of schema '{}' of catalog '{}'", schema, snapshotContext.catalogName);
-
-            Tables.TableFilter tableFilter = snapshottingTask.isBlocking() ? Tables.TableFilter.fromPredicate(snapshotContext.capturedTables::contains)
-                    : connectorConfig.getTableFilters().dataCollectionFilter();
-
-            jdbcConnection.readSchema(
-                    snapshotContext.tables,
-                    snapshotContext.catalogName,
-                    schema,
-                    tableFilter,
-                    null,
-                    false);
+        // for (String schema : schemas) {
+        if (!sourceContext.isRunning()) {
+            throw new InterruptedException("Interrupted while reading structure of schema " + schema);
         }
+
+        LOGGER.info("Reading structure of schema '{}' of catalog '{}'", schema, snapshotContext.catalogName);
+
+        Tables.TableFilter tableFilter = snapshottingTask.isBlocking() ? Tables.TableFilter.fromPredicate(snapshotContext.capturedTables::contains)
+                : connectorConfig.getTableFilters().dataCollectionFilter();
+
+        LOGGER.info("Reading structure catalog '{}'", snapshotContext.catalogName);
+        jdbcConnection.readSchema(
+                snapshotContext.tables,
+                snapshotContext.catalogName,
+                null,
+                tableFilter,
+                null,
+                false);
+        // }
         schema.refresh(jdbcConnection, false);
     }
 
