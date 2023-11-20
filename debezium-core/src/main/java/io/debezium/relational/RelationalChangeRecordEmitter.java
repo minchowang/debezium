@@ -6,8 +6,6 @@
 package io.debezium.relational;
 
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.header.ConnectHeaders;
@@ -95,41 +93,14 @@ public abstract class RelationalChangeRecordEmitter<P extends Partition>
     @Override
     protected void emitUpdateRecord(Receiver<P> receiver, TableSchema tableSchema)
             throws InterruptedException {
-        CompletableFuture<Object[]> oldColumnValuesFuture = CompletableFuture.supplyAsync(this::getOldColumnValues);
-        CompletableFuture<Object[]> newColumnValuesFuture = CompletableFuture.supplyAsync(this::getNewColumnValues);
+        Object[] oldColumnValues = getOldColumnValues();
+        Object[] newColumnValues = getNewColumnValues();
 
-        CompletableFuture.allOf(oldColumnValuesFuture, newColumnValuesFuture).join();
+        Struct oldKey = tableSchema.keyFromColumnData(oldColumnValues);
+        Struct newKey = tableSchema.keyFromColumnData(newColumnValues);
 
-        Object[] oldColumnValues;
-        Object[] newColumnValues;
-        try {
-            oldColumnValues = oldColumnValuesFuture.get();
-            newColumnValues = newColumnValuesFuture.get();
-        }
-        catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-
-        CompletableFuture<Struct> oldKeyFuture = CompletableFuture.supplyAsync(() -> tableSchema.keyFromColumnData(oldColumnValues));
-        CompletableFuture<Struct> newKeyFuture = CompletableFuture.supplyAsync(() -> tableSchema.keyFromColumnData(newColumnValues));
-        CompletableFuture<Struct> newValueFuture = CompletableFuture.supplyAsync(() -> tableSchema.valueFromColumnData(newColumnValues));
-        CompletableFuture<Struct> oldValueFuture = CompletableFuture.supplyAsync(() -> tableSchema.valueFromColumnData(oldColumnValues));
-
-        CompletableFuture.allOf(oldKeyFuture, newKeyFuture, newValueFuture, oldValueFuture).join();
-
-        Struct oldKey;
-        Struct newKey;
-        Struct newValue;
-        Struct oldValue;
-        try {
-            oldKey = oldKeyFuture.get();
-            newKey = newKeyFuture.get();
-            newValue = newValueFuture.get();
-            oldValue = oldValueFuture.get();
-        }
-        catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        Struct newValue = tableSchema.valueFromColumnData(newColumnValues);
+        Struct oldValue = tableSchema.valueFromColumnData(oldColumnValues);
 
         if (skipEmptyMessages() && (newColumnValues == null || newColumnValues.length == 0)) {
             LOGGER.debug("no new values found for table '{}' from update message at '{}'; skipping record", tableSchema, getOffset().getSourceInfo());
