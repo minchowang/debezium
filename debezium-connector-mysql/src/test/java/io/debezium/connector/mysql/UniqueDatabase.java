@@ -193,8 +193,8 @@ public class UniqueDatabase {
         Builder builder = Configuration.create()
                 .with(MySqlConnectorConfig.HOSTNAME, System.getProperty("database.hostname", "localhost"))
                 .with(MySqlConnectorConfig.PORT, System.getProperty("database.port", "3306"))
-                .with(MySqlConnectorConfig.USER, "snapper")
-                .with(MySqlConnectorConfig.PASSWORD, "snapperpass");
+                .with(MySqlConnectorConfig.USER, "root")
+                .with(MySqlConnectorConfig.PASSWORD, "debezium-rocks");
 
         String sslMode = System.getProperty("database.ssl.mode", "preferred");
 

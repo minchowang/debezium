@@ -16,7 +16,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
-
 /** Temporal conversion constants. */
 public final class TemporalConversions {
 

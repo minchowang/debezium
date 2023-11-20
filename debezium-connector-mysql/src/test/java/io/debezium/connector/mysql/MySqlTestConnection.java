@@ -109,8 +109,8 @@ public class MySqlTestConnection extends JdbcConnection {
         return JdbcConfiguration.adapt(configuration.edit()
                 .withDefault(JdbcConfiguration.HOSTNAME, "localhost")
                 .withDefault(JdbcConfiguration.PORT, 3306)
-                .withDefault(JdbcConfiguration.USER, "mysqluser")
-                .withDefault(JdbcConfiguration.PASSWORD, "mysqlpw")
+                .withDefault(JdbcConfiguration.USER, "root")
+                .withDefault(JdbcConfiguration.PASSWORD, "debezium-rocks")
                 .build());
 
     }

@@ -159,8 +159,8 @@
         <!-- 
         Specify the properties for the various Docker containers.
         -->
-        <mysql.user>mysqluser</mysql.user>
-        <mysql.password>mysqlpw</mysql.password>
+        <mysql.user>root</mysql.user>
+        <mysql.password>debezium-rocks</mysql.password>
         <mysql.replica.user>mysqlreplica</mysql.replica.user>
         <mysql.replica.password>mysqlpw</mysql.replica.password>
         <mysql.port>3306</mysql.port>
@@ -176,7 +176,7 @@
         By default, we should use the docker image maintained by the MySQL team. This property is changed with different profiles.
         However, we run one container with GTIDs and one without.
         -->
-        <docker.dbs>debezium/mysql-server-test-database</docker.dbs>
+        <docker.dbs>debezium/example-mysql</docker.dbs>
         <docker.filter>${docker.dbs}</docker.filter>
         <docker.skip>false</docker.skip>
         <docker.initimage>rm -f /etc/localtime; ln -s /usr/share/zoneinfo/US/Samoa /etc/localtime</docker.initimage>
@@ -197,7 +197,7 @@
                         -->
                         <image>
                             <!-- A Docker image using a partial MySQL installation maintained by MySQL team. -->
-                            <name>debezium/mysql-server-test-database</name>
+                            <name>debezium/example-mysql</name>
                             <run>
                                 <namingStrategy>none</namingStrategy>
                                 <env>
@@ -621,7 +621,7 @@
             <properties>
                 <!-- Run multiple images at the same time, but use different ports for all MySQL servers -->
                 <docker.dbs>
-                    debezium/mysql-server-test-database,debezium/mysql-server-gtids-test-database,debezium/mysql-server-gtids-test-database-replica,debezium/percona-server-test-database,debezium/mysql-server-test-database-ssl
+                    debezium/example-mysql,debezium/mysql-server-gtids-test-database,debezium/mysql-server-gtids-test-database-replica,debezium/percona-server-test-database,debezium/mysql-server-test-database-ssl
                 </docker.dbs>
                 <mysql.port>4301</mysql.port>
                 <mysql.gtid.port>4302</mysql.gtid.port>

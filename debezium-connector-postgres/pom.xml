@@ -29,7 +29,7 @@
         <docker.skip>false</docker.skip>
         <docker.showLogs>true</docker.showLogs>
         <docker.initimage>ln -fs /usr/share/zoneinfo/US/Samoa /etc/localtime &amp;&amp; echo timezone=US/Samoa &gt;&gt; ${postgres.config.file}</docker.initimage>
-        <docker.dbs>debezium/postgres-server-test-database</docker.dbs>
+        <docker.dbs>debezium/example-postgres</docker.dbs>
         <docker.filter>${docker.dbs}</docker.filter>
 
         <protobuf.output.directory>${project.basedir}/generated-sources</protobuf.output.directory>

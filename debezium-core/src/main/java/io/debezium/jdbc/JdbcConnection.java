@@ -1184,16 +1184,40 @@ public class JdbcConnection implements AutoCloseable {
         }
         else {
             for (TableId includeTable : tableIds) {
+                TableId templeteTableId = new TableId(null, null, includeTable.table());
                 LOGGER.debug("Retrieving columns of table {}", includeTable);
+                if (columnsByTable.containsKey(templeteTableId)) {
+                    List<Column> columns = columnsByTable.get(new TableId(null, null, includeTable.table()));
+                    Map<TableId, List<Column>> map = new HashMap<>();
+                    map.put(includeTable, columns);
+                    columnsByTable.putAll(map);
+                    continue;
+                }
 
-                Map<TableId, List<Column>> cols = getColumnsDetails(databaseCatalog, schemaNamePattern, includeTable.table(), tableFilter,
+                Map<TableId, List<Column>> cols = getColumnsDetails(databaseCatalog, includeTable.schema(), includeTable.table(), tableFilter,
                         columnFilter, metadata, viewIds);
+                List<Column> columns = cols.get(includeTable);
+                columnsByTable.put(templeteTableId, columns);
                 columnsByTable.putAll(cols);
             }
         }
 
+        HashMap<TableId, List<Column>> colsMap = new HashMap<>();
+        HashMap<TableId, List<String>> pkColumnNamesMap = new HashMap<>();
+        HashMap<TableId, String> defaultCharsetNameMap = new HashMap<>();
+        HashMap<TableId, List<Attribute>> attributesMap = new HashMap<>();
         // Read the metadata for the primary keys ...
         for (Entry<TableId, List<Column>> tableEntry : columnsByTable.entrySet()) {
+            TableId templeteTableId = new TableId(null, null, tableEntry.getKey().table());
+            if (colsMap.containsKey(templeteTableId)) {
+
+                List<Column> columns = colsMap.get(templeteTableId);
+                List<String> pkColumnNames = pkColumnNamesMap.get(templeteTableId);
+                String defaultCharsetName = defaultCharsetNameMap.get(templeteTableId);
+                List<Attribute> attributes = attributesMap.get(templeteTableId);
+                tables.overwriteTable(tableEntry.getKey(), columns, pkColumnNames, defaultCharsetName, attributes);
+                continue;
+            }
             // First get the primary key information, which must be done for *each* table ...
             List<String> pkColumnNames = readPrimaryKeyOrUniqueIndexNames(metadata, tableEntry.getKey());
 
@@ -1202,6 +1226,10 @@ public class JdbcConnection implements AutoCloseable {
             Collections.sort(columns);
             String defaultCharsetName = null; // JDBC does not expose character sets
             List<Attribute> attributes = attributesByTable.getOrDefault(tableEntry.getKey(), Collections.emptyList());
+            colsMap.put(templeteTableId, columns);
+            pkColumnNamesMap.put(templeteTableId, pkColumnNames);
+            defaultCharsetNameMap.put(templeteTableId, defaultCharsetName);
+            attributesMap.put(templeteTableId, attributes);
             tables.overwriteTable(tableEntry.getKey(), columns, pkColumnNames, defaultCharsetName, attributes);
         }
 

@@ -70,7 +70,7 @@ public class PostgresConnection extends JdbcConnection {
     private static Logger LOGGER = LoggerFactory.getLogger(PostgresConnection.class);
 
     private static final String URL_PATTERN = "jdbc:postgresql://${" + JdbcConfiguration.HOSTNAME + "}:${"
-            + JdbcConfiguration.PORT + "}/${" + JdbcConfiguration.DATABASE + "}" + "?defaultRowFetchSize=2048";
+            + JdbcConfiguration.PORT + "}/${" + JdbcConfiguration.DATABASE + "}" + "?defaultRowFetchSize=10240";
     protected static final ConnectionFactory FACTORY = JdbcConnection.patternBasedFactory(URL_PATTERN,
             org.postgresql.Driver.class.getName(),
             PostgresConnection.class.getClassLoader(), JdbcConfiguration.PORT.withDefault(PostgresConnectorConfig.PORT.defaultValueAsString()));
